@@ -22,3 +22,6 @@ time_interval: 0.05<br/>
 `python server.py`<br/>
 open browser 127.0.0.1:8888<br/>
 `python client.py`
+
+## TODO
+Add test
