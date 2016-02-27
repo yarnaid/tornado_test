@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Index Page</title>
+    <link rel="stylesheet" href="{{static_url("bootstrap/css/bootstrap.min.css")}}">
+    <link rel="stylesheet" href="{{static_url("bootstrap/css/bootstrap-theme.min.css")}}">
+    <script src="{{static_url("js/jquery-2.2.1.min.js")}}"></script>
+    <script src="{{static_url("bootstrap/js/bootstrap.min.js")}}"></script>
+
+    <link rel="stylesheet" href="{{static_url("bootstrap_table/bootstrap-table.min.css")}}">
+    <script src="{{static_url("bootstrap_table/bootstrap-table.min.js")}}"></script>
+
+</head>
+<body>
+
+<script type="text/javascript">
+    var ws = new WebSocket('ws://{{ws_url}}');
+    var clients_table = '#clients_table';
+    var messages_table = '#messages_table';
+    $(function () {
+          $(clients_table).bootstrapTable();
+          $(messages_table).bootstrapTable();
+    });
+    ws.onmessage = function (event) {
+        // var d = JSON.parse(event.data);
+        var d = JSON.parse(event.data);
+        var t = undefined;
+        if (d.active) {
+            t = clients_table;
+            d = d.active;
+        } else if (d.message) {
+            t = messages_table;
+            d = [d];
+        } else if(d.closed) {
+            $(clients_table).bootstrapTable('remove', {
+                field: 'id',
+                values: [d.id]
+            });
+            d = undefined;
+            t = undefined;
+        } else if(d.opened) {
+            t = clients_table;
+            d = {id: d.id, name: d.worker};
+        }
+        if (t) {
+            $(t).bootstrapTable('prepend', d);
+        }
+    };
+</script>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="panel panel-default">
+              <div class="panel-heading">Messages</div>
+              <div>
+                  <table class="table table-striped" id="messages_table"
+                    data-search="true"
+                    data-show-toggle="true"
+                    data-show-columns="true"
+                    data-pagination="true"
+                    >
+                    <thead>
+                        <tr>
+                            <th data-field="worker">Client Name</th>
+                            <th data-field="message">Message</th>
+                            <th data-field="id" data-visible="false">Worker</th>
+                        </tr>
+                    </thead>
+                  </table>
+              </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="panel panel-default">
+              <div class="panel-heading">Clients</div>
+              <div>
+                  <table class="table table-striped" id="clients_table"
+                    data-search="true"
+                    data-show-toggle="true"
+                    data-show-columns="true"
+                    data-pagination="true"
+                    >
+
+                    <thead>
+                        <tr>
+                            <th data-field="name">Client Name</th>
+                            <th data-field="id" data-visible="false">Client ID</th>
+                        </tr>
+                    </thead>
+                  </table>
+              </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
