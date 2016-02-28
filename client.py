@@ -14,8 +14,6 @@ import helpers
 
 logger = logging.getLogger()
 
-clients_set = set()
-
 
 class Client(object):
     name = None
